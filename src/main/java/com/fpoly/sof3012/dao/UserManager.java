@@ -3,6 +3,8 @@ package com.fpoly.sof3012.dao;
 import com.fpoly.sof3012.entity.User;
 import jakarta.persistence.*;
 
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserManager {
@@ -55,10 +57,9 @@ public class UserManager {
         }
     }
 
-    public List<User> findUsersByEmailAndRole(String emailDomain, boolean isAdmin) {
-        String jpql = "SELECT o FROM User o WHERE o.email LIKE :search AND o.admin = :role";
+    public List<User> findUsersByRole(boolean isAdmin) {
+        String jpql = "SELECT o FROM User o WHERE o.admin = :role";
         TypedQuery<User> query = em.createQuery(jpql, User.class);
-        query.setParameter("search", "%" + emailDomain);
         query.setParameter("role", isAdmin);
         return query.getResultList();
     }
