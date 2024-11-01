@@ -7,7 +7,7 @@ import jakarta.persistence.Persistence;
 public class XJpa {
 	private static EntityManagerFactory factory;
 	static {
-		factory = Persistence.createEntityManagerFactory("default");
+		factory = Persistence.createEntityManagerFactory("PolyOE");
 	}
 
 	public static EntityManager getEntityManager() {

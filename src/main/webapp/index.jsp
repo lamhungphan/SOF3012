@@ -1,55 +1,70 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page pageEncoding="utf-8" %>
+<%@ taglib uri="http://java.sun.com/jstl/fmt_rt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form with Bootstrap</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="utf-8">
+    <title>Department Management</title>
 </head>
 <body>
-<div class="container mt-5">
+<c:url var="path" value="/user"/>
+<!-- FORM -->
+<form method="post" action="${path}/index">
+    <br>
+    <label>Id</label>
+    <input name="id" value="${item.id}">
+    <br>
+    <label>Fullname</label>
+    <input name="fullname" value="${item.fullname}">
+    <br>
+    <label>Password</label>
+    <input name="password" value="${item.password}">
+    <br>
+    <label>Email</label>
+    <input name="email" value="${item.email}">
+    <br>
+    <input type="checkbox" name="admin" ${item.admin ? 'checked' : ''} value="true">
+    <label>Admin:</label><br>
+    <button formaction="${path}/create">Create</button>
+    <button formaction="${path}/update">Update</button>
+    <button formaction="${path}/delete">Delete</button>
+    <button formaction="${path}/reset">Reset</button>
+    <label>Chon role:</label>
+    <input type="radio" name="role" value="Admin" ${item.admin == 'Admin' ? 'checked' : ''}>Admin
+    <input type="radio" name="role" value="User" ${item.admin == 'User' ? 'checked' : ''}> User
+    <input type="radio" name="role" value="All"> All
+    <button type="submit">Lọc</button>
+    <br>
+</form>
+<hr>
+<!-- TABLE -->
+<table border="1" style="width: 100%">
+    <thead>
+    <tr>
+        <th>No.</th>
+        <th>Id</th>
+        <th>Password</th>
+        <th>Fullname</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <c:forEach var="d" items="${list}" varStatus="vs">
+        <tr>
+            <td>${vs.count}</td>
+            <td>${d.id}</td>
+            <td>${d.password}</td>
+            <td>${d.fullname}</td>
+            <td>${d.email}</td>
+            <td>${d.admin ? 'Admin' : 'User'}</td>
+            <td><a href="${path}/edit/${d.id}">Edit</a></td>
+        </tr>
+    </c:forEach>
+    </tbody>
+</table>
 
-    <div class="card mt-4">
-        <table class="table table-bordered">
-            <thead class="table-primary">
-            <tr>
-                <th>Id</th>
-                <th>Fullname</th>
-                <th>Email</th>
-                <th>Password</th>
-                <th>Role</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach var="item" items="${list}">
-                <tr>
-                    <td>${item.id}</td>
-                    <td>${item.fullname}</td>
-                    <td>${item.email}</td>
-                    <td>${item.password}</td>
-                    <td>${item.admin}</td>
-                    <td><a href="${pageContext.request.contextPath}/index?findId=${item.id}" class="text-decoration-none">Edit</a>
-                    </td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
-        <div class="pagination mt-4 d-flex justify-content-center">
-            <c:if test="${totalPages > 1}">
-                <c:forEach var="i" begin="1" end="${totalPages}">
-                    <a href="${pageContext.request.contextPath}/index?page=${i}"
-                       class="btn btn-outline-primary mx-1 ${i == currentPage ? 'active' : ''}">${i}</a>
-                </c:forEach>
-            </c:if>
-        </div>
-    </div>
-</div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
