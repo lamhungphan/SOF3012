@@ -1,27 +1,32 @@
 package com.fpoly.sof3012.dao;
 
+import com.fpoly.sof3012.entity.Favorite;
 import com.fpoly.sof3012.entity.User;
+import com.fpoly.sof3012.entity.Video;
+import com.fpoly.sof3012.utils.XJpa;
 import jakarta.persistence.*;
 
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 
-public class UserManager {
-    EntityManagerFactory factory = Persistence.createEntityManagerFactory("PolyOE");
-    EntityManager em = factory.createEntityManager();
+public class UserDaoImp implements Dao {
+    static EntityManager em = XJpa.getEntityManager();
+    User entity = em.find(User.class, "id");
+    List<Favorite> favorites = entity.getFavorites();
 
+    @Override
     public List<User> findAll() {
         String jpql = "SELECT o FROM User o";
         TypedQuery<User> query = em.createQuery(jpql, User.class);
         return query.getResultList();
     }
 
+    @Override
     public User findById(String id) {
         return em.find(User.class, id);
     }
 
-    public User create(User user) {
+    @Override
+    public Object create(Object user) {
         try {
             em.getTransaction().begin();
             em.persist(user);
@@ -33,7 +38,8 @@ public class UserManager {
         return user;
     }
 
-    public User update(User user) {
+    @Override
+    public Object update(Object user) {
         try {
             em.getTransaction().begin();
             em.merge(user);
@@ -45,6 +51,7 @@ public class UserManager {
         return user;
     }
 
+    @Override
     public void deleteById(String id) {
         User user = em.find(User.class, id);
         try {
@@ -84,5 +91,11 @@ public class UserManager {
         TypedQuery<Long> query = em.createQuery(jpql, Long.class);
         Long n = query.getSingleResult();
         System.out.println("Total admin is: " + n);
+    }
+
+    public static void main(String[] args) {
+        String jpql = "SELECT o FROM User o WHERE o.favorites IS NOT EMPTY";
+        TypedQuery<User> query = em.createQuery(jpql, User.class);
+        List<User> users = query.getResultList();
     }
 }

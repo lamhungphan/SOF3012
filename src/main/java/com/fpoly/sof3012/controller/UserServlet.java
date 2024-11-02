@@ -4,7 +4,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import com.fpoly.sof3012.dao.UserManager;
+import com.fpoly.sof3012.dao.UserDaoImp;
 import com.fpoly.sof3012.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
@@ -20,13 +20,13 @@ import org.apache.commons.beanutils.BeanUtils;
 public class UserServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private void handleEdit(HttpServletRequest req, UserManager dao) {
+    private void handleEdit(HttpServletRequest req, UserDaoImp dao) {
         String editId = req.getPathInfo().substring(1);
         User user = dao.findById(editId);
         req.setAttribute("item", user);
     }
 
-    private void handleCreateOrUpdate(HttpServletRequest req, UserManager dao, boolean isUpdate) {
+    private void handleCreateOrUpdate(HttpServletRequest req, UserDaoImp dao, boolean isUpdate) {
         User user = new User();
 
         try {
@@ -51,13 +51,13 @@ public class UserServlet extends HttpServlet {
         req.setAttribute("item", new User());
     }
 
-    private void handleDelete(HttpServletRequest req, UserManager dao) {
+    private void handleDelete(HttpServletRequest req, UserDaoImp dao) {
         String userId = req.getParameter("id");
         dao.deleteById(userId);
         req.setAttribute("item", new User());
     }
 
-    private void handleListUser(HttpServletRequest req, UserManager dao) {
+    private void handleListUser(HttpServletRequest req, UserDaoImp dao) {
         String role = req.getParameter("role");
         List<User> list;
 
@@ -73,7 +73,7 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getServletPath();
-        UserManager dao = new UserManager();
+        UserDaoImp dao = new UserDaoImp();
         boolean isActionHandled = false;
 
         if (path.contains("edit")) {

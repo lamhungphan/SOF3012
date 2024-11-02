@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "favorites")
+@Table(name = "Favorites")
 public class Favorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
