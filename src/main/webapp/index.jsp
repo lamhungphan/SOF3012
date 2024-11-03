@@ -49,6 +49,7 @@
         <th>Email</th>
         <th>Role</th>
         <th>Action</th>
+        <th>Favorites</th>
     </tr>
     </thead>
     <tbody>
@@ -61,6 +62,30 @@
             <td>${d.email}</td>
             <td>${d.admin ? 'Admin' : 'User'}</td>
             <td><a href="${path}/edit/${d.id}">Edit</a></td>
+        </tr>
+    </c:forEach>
+    </tbody>
+</table>
+
+<hr>
+
+<h2>Video Yêu Thích của ${item.fullname}</h2>
+<table border="1" style="width: 100%">
+    <thead>
+    <tr>
+        <th>Video Title</th>
+        <th>Poster</th>
+        <th>Description</th>
+        <th>Like Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <c:forEach var="favorite" items="${favorites}">
+        <tr>
+            <td>${favorite.video.title}</td>
+            <td><img src="${favorite.video.poster}" alt="Poster" width="100"></td>
+            <td>${favorite.video.description}</td>
+            <td>${favorite.likeDate}</td>
         </tr>
     </c:forEach>
     </tbody>

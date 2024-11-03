@@ -2,16 +2,15 @@ package com.fpoly.sof3012.dao;
 
 import com.fpoly.sof3012.entity.Favorite;
 import com.fpoly.sof3012.entity.User;
-import com.fpoly.sof3012.entity.Video;
 import com.fpoly.sof3012.utils.XJpa;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-public class UserDaoImp implements Dao {
+public class UserDaoImpl implements Dao<User> {
     static EntityManager em = XJpa.getEntityManager();
-    User entity = em.find(User.class, "id");
-    List<Favorite> favorites = entity.getFavorites();
+//    User entity = em.find(User.class, "id");
+//    List<Favorite> favorites = entity.getFavorites();
 
     @Override
     public List<User> findAll() {
@@ -26,7 +25,7 @@ public class UserDaoImp implements Dao {
     }
 
     @Override
-    public Object create(Object user) {
+    public User create(User user) {
         try {
             em.getTransaction().begin();
             em.persist(user);
@@ -39,7 +38,7 @@ public class UserDaoImp implements Dao {
     }
 
     @Override
-    public Object update(Object user) {
+    public User update(User user) {
         try {
             em.getTransaction().begin();
             em.merge(user);

@@ -4,29 +4,37 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import com.fpoly.sof3012.dao.UserDaoImp;
+import com.fpoly.sof3012.dao.UserDaoImpl;
+import com.fpoly.sof3012.entity.Favorite;
 import com.fpoly.sof3012.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import org.apache.commons.beanutils.BeanUtils;
 
+import javax.xml.stream.FactoryConfigurationError;
+
 @WebServlet({"/user/index",
         "/user/edit/*",
         "/user/create",
         "/user/update",
         "/user/delete",
-        "/user/reset"})
+        "/user/reset",
+        "/user/favorites"
+})
 public class UserServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private void handleEdit(HttpServletRequest req, UserDaoImp dao) {
+    private void handleEdit(HttpServletRequest req, UserDaoImpl dao) {
         String editId = req.getPathInfo().substring(1);
         User user = dao.findById(editId);
         req.setAttribute("item", user);
+
+        List<Favorite> favorites = user.getFavorites();
+        req.setAttribute("favorites", favorites);
     }
 
-    private void handleCreateOrUpdate(HttpServletRequest req, UserDaoImp dao, boolean isUpdate) {
+    private void handleCreateOrUpdate(HttpServletRequest req, UserDaoImpl dao, boolean isUpdate) {
         User user = new User();
 
         try {
@@ -51,13 +59,13 @@ public class UserServlet extends HttpServlet {
         req.setAttribute("item", new User());
     }
 
-    private void handleDelete(HttpServletRequest req, UserDaoImp dao) {
+    private void handleDelete(HttpServletRequest req, UserDaoImpl dao) {
         String userId = req.getParameter("id");
         dao.deleteById(userId);
         req.setAttribute("item", new User());
     }
 
-    private void handleListUser(HttpServletRequest req, UserDaoImp dao) {
+    private void handleListUser(HttpServletRequest req, UserDaoImpl dao) {
         String role = req.getParameter("role");
         List<User> list;
 
@@ -70,10 +78,25 @@ public class UserServlet extends HttpServlet {
         req.setAttribute("list", list);
     }
 
+    private void handleUserFavorites(HttpServletRequest req, HttpServletResponse resp, UserDaoImpl dao) throws ServletException, IOException {
+//        String userId = req.getParameter("userId");
+//        User user = dao.findById(userId);
+//
+//        if (user != null) {
+//            List<Favorite> favorites = user.getFavorites();
+//            req.setAttribute("user", user);
+//            req.setAttribute("favorites", favorites);
+//            req.getRequestDispatcher("/userFavorites.jsp").forward(req, resp);
+//        } else {
+//            req.setAttribute("message", "Người dùng không tồn tại.");
+//            req.getRequestDispatcher("/index.jsp").forward(req, resp);
+//        }
+    }
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getServletPath();
-        UserDaoImp dao = new UserDaoImp();
+        UserDaoImpl dao = new UserDaoImpl();
         boolean isActionHandled = false;
 
         if (path.contains("edit")) {
@@ -84,7 +107,12 @@ public class UserServlet extends HttpServlet {
             handleCreateOrUpdate(req, dao, true);
         } else if (path.contains("delete")) {
             handleDelete(req, dao);
+        } else if (path.contains("favorites")) {
+            handleUserFavorites(req, resp, dao);
+        } else {
+            handleListUser(req, dao);
         }
+
         if (!isActionHandled) {
             handleListUser(req, dao);
         }
