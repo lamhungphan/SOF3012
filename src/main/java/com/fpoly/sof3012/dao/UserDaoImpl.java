@@ -5,6 +5,8 @@ import com.fpoly.sof3012.entity.User;
 import com.fpoly.sof3012.utils.XJpa;
 import jakarta.persistence.*;
 
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoImpl implements Dao<User> {
