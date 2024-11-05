@@ -12,8 +12,6 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import org.apache.commons.beanutils.BeanUtils;
 
-import javax.xml.stream.FactoryConfigurationError;
-
 @WebServlet({"/user/index",
         "/user/edit/*",
         "/user/create",
@@ -34,16 +32,27 @@ public class UserServlet extends HttpServlet {
         req.setAttribute("favorites", favorites);
     }
 
-    private void handleCreateOrUpdate(HttpServletRequest req, UserDaoImpl dao, boolean isUpdate) {
+    private void handleCreateOrUpdate(HttpServletRequest req, HttpServletResponse resp, UserDaoImpl dao, boolean isUpdate) throws ServletException, IOException {
         User user = new User();
+        String id = req.getParameter("id").trim();
+
+        if (id.isEmpty() || id.contains(" ")) {
+            req.setAttribute("error", "ID không được để trống hoặc chứa khoảng trắng");
+            req.getRequestDispatcher("/index.jsp");
+            return;
+        }
+
+        if (dao.isUserIdExists(id)) {
+            req.setAttribute("error", "ID đã tồn tại, vui lòng chọn ID khác");
+            req.getRequestDispatcher("/index.jsp").forward(req, resp);
+            return;
+        }
 
         try {
             BeanUtils.populate(user, req.getParameterMap());
             String adminCheckbox = req.getParameter("admin");
             user.setAdmin(adminCheckbox != null && adminCheckbox.equals("true"));
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
 
@@ -54,7 +63,7 @@ public class UserServlet extends HttpServlet {
                 dao.create(user);
             }
         } catch (Exception e) {
-            req.setAttribute("message", isUpdate ? "Cập nhật thất bại" : "Trùng khóa chính");
+            throw new RuntimeException(e);
         }
         req.setAttribute("item", new User());
     }
@@ -67,13 +76,21 @@ public class UserServlet extends HttpServlet {
 
     private void handleListUser(HttpServletRequest req, UserDaoImpl dao) {
         String role = req.getParameter("role");
-        List<User> list;
+        String keyword = req.getParameter("filterName");
+        List<User> list = dao.findAll(); // Mặc định là tìm tất cả user
 
-        if (role == null || role.equals("All")) {
-            list = dao.findAll();
-        } else {
+        // Tìm theo tên nếu có keyword
+        if (keyword != null && !keyword.isEmpty()) {
+            list = dao.findUsersByName("%" + keyword + "%");
+        }
+
+        // Tìm theo role nếu có role
+        if (role != null && !role.equals("All")) {
             boolean isAdmin = role.equals("Admin");
-            list = dao.findUsersByRole(isAdmin);
+            List<User> roleList = dao.findUsersByRole(isAdmin);
+
+            // Giữ lại user có trong cả danh sách tên và role
+            list.retainAll(roleList);
         }
         req.setAttribute("list", list);
     }
@@ -102,9 +119,9 @@ public class UserServlet extends HttpServlet {
         if (path.contains("edit")) {
             handleEdit(req, dao);
         } else if (path.contains("create")) {
-            handleCreateOrUpdate(req, dao, false);
+            handleCreateOrUpdate(req, resp, dao, false);
         } else if (path.contains("update")) {
-            handleCreateOrUpdate(req, dao, true);
+            handleCreateOrUpdate(req, resp, dao, true);
         } else if (path.contains("delete")) {
             handleDelete(req, dao);
         } else if (path.contains("favorites")) {

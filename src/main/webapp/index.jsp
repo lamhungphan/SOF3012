@@ -30,12 +30,21 @@
     <button formaction="${path}/update">Update</button>
     <button formaction="${path}/delete">Delete</button>
     <button formaction="${path}/reset">Reset</button>
-    <label>Chon role:</label>
-    <input type="radio" name="role" value="Admin" ${item.admin == 'Admin' ? 'checked' : ''}>Admin
-    <input type="radio" name="role" value="User" ${item.admin == 'User' ? 'checked' : ''}> User
-    <input type="radio" name="role" value="All"> All
+    <br>
+    <label>Chọn role:</label>
+    <input type="radio" name="role" value="Admin" ${param.role == 'Admin' ? 'checked' : ''}>Admin
+    <input type="radio" name="role" value="User" ${param.role == 'User' ? 'checked' : ''}> User
+    <input type="radio" name="role" value="All" ${param.role == 'All' ? 'checked' : ''}> All
+    <br>
+    <label>Tìm tên</label>
+    <input type="text" name="filterName" placeholder="Tên muốn tìm" value="${param.filterName}">
     <button type="submit">Lọc</button>
     <br>
+    <h3>
+        <c:if test="${not empty error}">
+            <p style="color:red">${error}</p>
+        </c:if>
+    </h3>
 </form>
 <hr>
 <!-- TABLE -->

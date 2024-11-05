@@ -1,12 +1,9 @@
 package com.fpoly.sof3012.dao;
 
-import com.fpoly.sof3012.entity.Favorite;
 import com.fpoly.sof3012.entity.User;
 import com.fpoly.sof3012.utils.XJpa;
 import jakarta.persistence.*;
 
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoImpl implements Dao<User> {
@@ -37,6 +34,13 @@ public class UserDaoImpl implements Dao<User> {
             e.printStackTrace();
         }
         return user;
+    }
+
+    public boolean isUserIdExists(String id) {
+        String jpql = "SELECT COUNT(o) FROM User o WHERE o.id = :id";
+        TypedQuery<Long> query = em.createQuery(jpql, Long.class);
+        query.setParameter("id", id);
+        return query.getSingleResult() > 0;
     }
 
     @Override
@@ -72,8 +76,15 @@ public class UserDaoImpl implements Dao<User> {
         return query.getResultList();
     }
 
-    public List<User> findUsersByPage(int pageNumber, int pageSize) {
-        String jpql = "SELECT u FROM User u";
+    public List<User> findUsersByName(String keyword) {
+        String jpql = "SELECT o FROM User o WHERE o.fullname LIKE :fullname";
+        TypedQuery<User> query = em.createQuery(jpql, User.class);
+        query.setParameter("fullname", keyword);
+        return query.getResultList();
+    }
+
+    public List<User> getPage(int pageNumber, int pageSize) {
+        String jpql = "SELECT o FROM User o";
         TypedQuery<User> query = em.createQuery(jpql, User.class);
         query.setFirstResult((pageNumber - 1) * pageSize);
         query.setMaxResults(pageSize);
