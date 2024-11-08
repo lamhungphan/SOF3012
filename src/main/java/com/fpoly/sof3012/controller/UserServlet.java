@@ -18,7 +18,7 @@ import org.apache.commons.beanutils.BeanUtils;
         "/user/update",
         "/user/delete",
         "/user/reset",
-        "/user/favorites"
+        "/user/favorites",
 })
 public class UserServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -38,13 +38,7 @@ public class UserServlet extends HttpServlet {
 
         if (id.isEmpty() || id.contains(" ")) {
             req.setAttribute("error", "ID không được để trống hoặc chứa khoảng trắng");
-            req.getRequestDispatcher("/index.jsp");
-            return;
-        }
-
-        if (dao.isUserIdExists(id)) {
-            req.setAttribute("error", "ID đã tồn tại, vui lòng chọn ID khác");
-            req.getRequestDispatcher("/index.jsp").forward(req, resp);
+            req.getRequestDispatcher("/views/user/demo.jsp");
             return;
         }
 
@@ -61,6 +55,11 @@ public class UserServlet extends HttpServlet {
                 dao.update(user);
             } else {
                 dao.create(user);
+                if (dao.isUserIdExists(id)) {
+                    req.setAttribute("error", "ID đã tồn tại, vui lòng chọn ID khác");
+                    req.getRequestDispatcher("/views/user/demo.jsp").forward(req, resp);
+                    return;
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -79,12 +78,12 @@ public class UserServlet extends HttpServlet {
         String keyword = req.getParameter("filterName");
         List<User> list = dao.findAll(); // Mặc định là tìm tất cả user
 
-        // Tìm theo tên nếu có keyword
-        if (keyword != null && !keyword.isEmpty()) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            list = dao.findAll();
+        } else {
             list = dao.findUsersByName("%" + keyword + "%");
         }
 
-        // Tìm theo role nếu có role
         if (role != null && !role.equals("All")) {
             boolean isAdmin = role.equals("Admin");
             List<User> roleList = dao.findUsersByRole(isAdmin);
@@ -95,21 +94,6 @@ public class UserServlet extends HttpServlet {
         req.setAttribute("list", list);
     }
 
-    private void handleUserFavorites(HttpServletRequest req, HttpServletResponse resp, UserDaoImpl dao) throws ServletException, IOException {
-//        String userId = req.getParameter("userId");
-//        User user = dao.findById(userId);
-//
-//        if (user != null) {
-//            List<Favorite> favorites = user.getFavorites();
-//            req.setAttribute("user", user);
-//            req.setAttribute("favorites", favorites);
-//            req.getRequestDispatcher("/userFavorites.jsp").forward(req, resp);
-//        } else {
-//            req.setAttribute("message", "Người dùng không tồn tại.");
-//            req.getRequestDispatcher("/index.jsp").forward(req, resp);
-//        }
-    }
-
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getServletPath();
@@ -118,14 +102,15 @@ public class UserServlet extends HttpServlet {
 
         if (path.contains("edit")) {
             handleEdit(req, dao);
+            handleListUser(req, dao);
         } else if (path.contains("create")) {
             handleCreateOrUpdate(req, resp, dao, false);
+            handleListUser(req, dao);
         } else if (path.contains("update")) {
             handleCreateOrUpdate(req, resp, dao, true);
+            handleListUser(req, dao);
         } else if (path.contains("delete")) {
             handleDelete(req, dao);
-        } else if (path.contains("favorites")) {
-            handleUserFavorites(req, resp, dao);
         } else {
             handleListUser(req, dao);
         }
@@ -133,6 +118,6 @@ public class UserServlet extends HttpServlet {
         if (!isActionHandled) {
             handleListUser(req, dao);
         }
-        req.getRequestDispatcher("/index.jsp").forward(req, resp);
+        req.getRequestDispatcher("/views/user/demo.jsp").forward(req, resp);
     }
 }

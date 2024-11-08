@@ -33,4 +33,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Favorite> favorites;
+
+    @OneToMany(mappedBy = "user")
+    private List<Favorite> shares;
 }

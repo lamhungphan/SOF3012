@@ -1,7 +1,4 @@
 package com.fpoly.sof3012.dao;
-
-import com.fpoly.sof3012.entity.User;
-
 import java.util.List;
 
 public interface Dao<T> {
