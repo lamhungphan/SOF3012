@@ -1,15 +1,15 @@
-package com.fpoly.sof3012.dao;
+package com.fpoly.sof3012.dao.impl;
 
-import com.fpoly.sof3012.entity.User;
+import com.fpoly.sof3012.dao.Dao;
+import com.fpoly.sof3012.dao.VideoDao;
 import com.fpoly.sof3012.entity.Video;
 import com.fpoly.sof3012.utils.XJpa;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
-public class VideoDaoImpl implements Dao<Video>, VideoDao{
+public class VideoDaoImpl implements Dao<Video>, VideoDao {
     EntityManager em = XJpa.getEntityManager();
 
     @Override
@@ -71,29 +71,56 @@ public class VideoDaoImpl implements Dao<Video>, VideoDao{
         return list;
     }
 
-    public List<Video> findVideoByKeyword(String keyword){
+    public List<Video> getTop10Favorite() {
+        String jpql = "SELECT f.video FROM Favorite f GROUP BY f.video ORDER BY COUNT(f) DESC";
+        TypedQuery<Video> query = em.createQuery(jpql, Video.class);
+        query.setMaxResults(10);
+        return query.getResultList();
+    }
+
+    public List<Video> getNoFavorite() {
+        String jpql = "SELECT v FROM Video v WHERE v NOT IN (SELECT f FROM Favorite f)";
+        TypedQuery<Video> query = em.createQuery(jpql, Video.class);
+        return query.getResultList();
+    }
+
+    public List<Video> getVideoShareIn2024() {
+        String jpql = "SELECT s.video FROM Share s WHERE YEAR (s.shareDate) = 2024 ORDER BY shareDate";
+        TypedQuery<Video> query = em.createQuery(jpql, Video.class);
+        return query.getResultList();
+    }
+
+    public List<Object[]> getVideoShareSummary() {
+        String jpql =   "SELECT v.title, COUNT(s), MIN(s.shareDate), MAX(s.shareDate) " +
+                        "FROM Share s JOIN s.video v " +
+                        "GROUP BY v.title";
+        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
+        return query.getResultList();
+    }
+
+    public List<Video> findVideoByKeyword(String keyword) {
         String jpql = "SELECT o FROM Video o WHERE o.title LIKE :title";
         TypedQuery<Video> query = em.createQuery(jpql, Video.class);
         query.setParameter("title", keyword);
         return query.getResultList();
     }
 
-    // danh sach video duoc yeu thich
-    public List<Video> getFavoriteVideo(Object userId){
+    public List<Video> getFavoriteVideo(Object userId) {
         String jpql = "SELECT f.video FROM Favorite f where f.user.id =:userId ";
         TypedQuery<Video> query = em.createQuery(jpql, Video.class);
         query.setParameter("userId", userId);
         return query.getResultList();
     }
 
-    public List<Video> getFavoriteVideos(){
-        String jpql = "SELECT f.video.title FROM Favorite f ";
-        TypedQuery<Video> query = em.createQuery(jpql, Video.class);
+    public List<Object[]> findVideoWithTotalLikes(String keyword) {
+        String jpql = "SELECT v, COUNT(f) AS totalLikes " +
+                "FROM Video v LEFT JOIN Favorite f ON f.video.id = v.id " +
+                "WHERE v.title LIKE :title " +
+                "GROUP BY v.id";
+        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
+        query.setParameter("title", "%" + keyword + "%");
         return query.getResultList();
     }
-
-    // danh sach video duoc share
-
 
 }
 

@@ -1,15 +1,15 @@
-package com.fpoly.sof3012.dao;
+package com.fpoly.sof3012.dao.impl;
 
+import com.fpoly.sof3012.dao.Dao;
+import com.fpoly.sof3012.dao.UserDao;
 import com.fpoly.sof3012.entity.User;
 import com.fpoly.sof3012.utils.XJpa;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-public class UserDaoImpl implements Dao<User> {
+public class UserDaoImpl implements Dao<User>, UserDao {
     static EntityManager em = XJpa.getEntityManager();
-//    User entity = em.find(User.class, "id");
-//    List<Favorite> favorites = entity.getFavorites();
 
     @Override
     public List<User> findAll() {
@@ -69,18 +69,27 @@ public class UserDaoImpl implements Dao<User> {
         }
     }
 
-    public List<User> findUsersByRole(boolean isAdmin) {
+    public List<User> findByRole(boolean isAdmin) {
         String jpql = "SELECT o FROM User o WHERE o.admin = :role";
         TypedQuery<User> query = em.createQuery(jpql, User.class);
         query.setParameter("role", isAdmin);
         return query.getResultList();
     }
 
-    public List<User> findUsersByName(String keyword) {
+    public List<User> findByName(String keyword) {
         String jpql = "SELECT o FROM User o WHERE o.fullname LIKE :fullname";
         TypedQuery<User> query = em.createQuery(jpql, User.class);
         query.setParameter("fullname", keyword);
         return query.getResultList();
+    }
+
+    @Override
+    public User findByIdOrEmail(String keyword) {
+        String jpql = "SELECT o FROM User o WHERE o.id = :id OR o.email = :email";
+        TypedQuery<User> query = em.createQuery(jpql, User.class);
+        query.setParameter("id", keyword);
+        query.setParameter("email", keyword);
+        return query.getSingleResult();
     }
 
     public List<User> getPage(int pageNumber, int pageSize) {
@@ -106,8 +115,6 @@ public class UserDaoImpl implements Dao<User> {
     }
 
     public static void main(String[] args) {
-        String jpql = "SELECT o FROM User o WHERE o.favorites IS NOT EMPTY";
-        TypedQuery<User> query = em.createQuery(jpql, User.class);
-        List<User> users = query.getResultList();
+
     }
 }

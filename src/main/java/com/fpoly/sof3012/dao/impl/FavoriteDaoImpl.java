@@ -1,9 +1,10 @@
-package com.fpoly.sof3012.dao;
+package com.fpoly.sof3012.dao.impl;
 
+import com.fpoly.sof3012.dao.Dao;
 import com.fpoly.sof3012.entity.Favorite;
-import com.fpoly.sof3012.entity.User;
 import com.fpoly.sof3012.utils.XJpa;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
@@ -46,7 +47,6 @@ public class FavoriteDaoImpl implements Dao<Favorite> {
         return favorite;
     }
 
-
     @Override
     public void deleteById(String id) {
         Favorite favorite = em.find(Favorite.class, id);
@@ -60,5 +60,12 @@ public class FavoriteDaoImpl implements Dao<Favorite> {
         }
     }
 
+    public List<Object[]> getFavoriteVideo() {
+        String jpql = "SELECT f.video.title, COUNT(f),  MIN(f.likeDate), MAX(f.likeDate) " +
+                "FROM Favorite f " +
+                "GROUP BY f.video.title";
+        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
+        return query.getResultList();
+    }
 
 }

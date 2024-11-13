@@ -2,13 +2,12 @@ package com.fpoly.sof3012.controller;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.fpoly.sof3012.dao.FavoriteDaoImpl;
-import com.fpoly.sof3012.dao.UserDaoImpl;
 import com.fpoly.sof3012.dao.VideoDao;
-import com.fpoly.sof3012.dao.VideoDaoImpl;
+import com.fpoly.sof3012.dao.impl.FavoriteDaoImpl;
+import com.fpoly.sof3012.dao.impl.UserDaoImpl;
+import com.fpoly.sof3012.dao.impl.VideoDaoImpl;
 import com.fpoly.sof3012.entity.Favorite;
 import com.fpoly.sof3012.entity.User;
 import com.fpoly.sof3012.entity.Video;
@@ -55,7 +54,7 @@ public class UserServlet extends HttpServlet {
 
     private void handleEdit(HttpServletRequest req, UserDaoImpl dao) {
         String editId = req.getPathInfo().substring(1);
-        User user = dao.findById(editId);
+        User user = dao.findByIdOrEmail(editId);
         req.setAttribute("item", user);
 
         List<Favorite> favorites = user.getFavorites();
@@ -111,12 +110,12 @@ public class UserServlet extends HttpServlet {
         if (keyword == null || keyword.trim().isEmpty()) {
             list = dao.findAll();
         } else {
-            list = dao.findUsersByName("%" + keyword + "%");
+            list = dao.findByName("%" + keyword + "%");
         }
 
         if (role != null && !role.equals("All")) {
             boolean isAdmin = role.equals("Admin");
-            List<User> roleList = dao.findUsersByRole(isAdmin);
+            List<User> roleList = dao.findByRole(isAdmin);
 
             // Giữ lại user có trong cả danh sách tên và role
             list.retainAll(roleList);

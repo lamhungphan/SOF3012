@@ -37,4 +37,7 @@ public class Favorite {
         this.user = user;
         this.likeDate = likeDate;
     }
+    public Favorite(Video video){
+        this.video = video;
+    }
 }
