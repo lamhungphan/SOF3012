@@ -1,5 +1,5 @@
--- create database PolyOE;
-use PolyOE;
+create database PolyOE_Lab;
+use PolyOE_Lab;
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (

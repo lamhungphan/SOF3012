@@ -2,11 +2,16 @@ package com.fpoly.sof3012.controller;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fpoly.sof3012.dao.FavoriteDaoImpl;
 import com.fpoly.sof3012.dao.UserDaoImpl;
+import com.fpoly.sof3012.dao.VideoDao;
+import com.fpoly.sof3012.dao.VideoDaoImpl;
 import com.fpoly.sof3012.entity.Favorite;
 import com.fpoly.sof3012.entity.User;
+import com.fpoly.sof3012.entity.Video;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -22,6 +27,31 @@ import org.apache.commons.beanutils.BeanUtils;
 })
 public class UserServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    UserDaoImpl userDao = new UserDaoImpl();
+    FavoriteDaoImpl favoriteDao = new FavoriteDaoImpl();
+    VideoDaoImpl videoDao = new VideoDaoImpl();
+
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String path = getPath(req);
+
+        if (path.contains("edit")) {
+            handleEdit(req, userDao);
+            handleVideo(req);
+            handleListUser(req, userDao);
+        } else if (path.contains("create")) {
+            handleCreateOrUpdate(req, resp, userDao, false);
+            handleListUser(req, userDao);
+        } else if (path.contains("update")) {
+            handleCreateOrUpdate(req, resp, userDao, true);
+            handleListUser(req, userDao);
+        } else if (path.contains("delete")) {
+            handleDelete(req, userDao);
+        }
+        handleListUser(req, userDao);
+        handleListFavorites(req, favoriteDao);
+        req.getRequestDispatcher("/views/user/demo.jsp").forward(req, resp);
+    }
 
     private void handleEdit(HttpServletRequest req, UserDaoImpl dao) {
         String editId = req.getPathInfo().substring(1);
@@ -94,30 +124,20 @@ public class UserServlet extends HttpServlet {
         req.setAttribute("list", list);
     }
 
-    @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String path = req.getServletPath();
-        UserDaoImpl dao = new UserDaoImpl();
-        boolean isActionHandled = false;
+    private void handleListFavorites(HttpServletRequest req, FavoriteDaoImpl favoriteDao) {
+        List<Favorite> favorites = favoriteDao.findAll();
+        req.setAttribute("favorites", favorites);
+    }
+     private void handleVideo(HttpServletRequest req ){
+        String editId = req.getPathInfo().substring(1);
+        List<User> users = userDao.findAll();
+        List<Video> videos = videoDao.getFavoriteVideo(editId);
+         System.out.println(videos);
+        req.setAttribute("users", users);
+        req.setAttribute("videos", videos);
+    }
 
-        if (path.contains("edit")) {
-            handleEdit(req, dao);
-            handleListUser(req, dao);
-        } else if (path.contains("create")) {
-            handleCreateOrUpdate(req, resp, dao, false);
-            handleListUser(req, dao);
-        } else if (path.contains("update")) {
-            handleCreateOrUpdate(req, resp, dao, true);
-            handleListUser(req, dao);
-        } else if (path.contains("delete")) {
-            handleDelete(req, dao);
-        } else {
-            handleListUser(req, dao);
-        }
-
-        if (!isActionHandled) {
-            handleListUser(req, dao);
-        }
-        req.getRequestDispatcher("/views/user/demo.jsp").forward(req, resp);
+    String getPath(HttpServletRequest req){
+        return req.getServletPath();
     }
 }

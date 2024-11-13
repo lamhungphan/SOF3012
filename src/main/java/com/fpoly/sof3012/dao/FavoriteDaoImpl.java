@@ -9,9 +9,7 @@ import java.util.List;
 
 public class FavoriteDaoImpl implements Dao<Favorite> {
     static EntityManager em = XJpa.getEntityManager();
-    User entity = em.find(Favorite.class, 123).getUser();
 
-    //   User user = entity.getUser();
     @Override
     public List<Favorite> findAll() {
         return em.createQuery("SELECT f FROM Favorite f ", Favorite.class).getResultList();
@@ -61,4 +59,6 @@ public class FavoriteDaoImpl implements Dao<Favorite> {
             e.printStackTrace();
         }
     }
+
+
 }

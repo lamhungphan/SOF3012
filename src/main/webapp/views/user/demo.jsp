@@ -45,7 +45,7 @@
             <p style="color:red">${error}</p>
         </c:if>
     </h3>
-</form>
+
 <hr>
 <!-- TABLE -->
 <table border="1" style="width: 100%">
@@ -75,27 +75,52 @@
     </tbody>
 </table>
 <hr>
-<h2>Video Yêu Thích của ${item.fullname}</h2>
+<h2>Video Yêu Thích  ${ item.fullname}</h2>
+<%--<select name="userId" onchange="this.form.submit()">--%>
+<%--    <c:forEach var="user" items="${users}">--%>
+<%--        <option value="${user.id}">--%>
+<%--            ${user.fullname}--%>
+<%--        </option>--%>
+<%--    </c:forEach>--%>
+<%--</select>--%>
+</form>
 <table border="1" style="width: 100%">
     <thead>
     <tr>
         <th>Video Title</th>
-        <th>Poster</th>
         <th>Description</th>
-        <th>Like Date</th>
+    </tr>
+    </thead>
+    <c:if test="${not empty videos}">
+        <tbody>
+        <c:forEach var="video" items="${videos}">
+            <tr>
+                <td>${video.title}</td>
+                <td>${video.description}</td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </c:if>
+</table>
+<hr>
+<h2>Video được Yêu Thích</h2>
+<table border="1" style="width: 100%">
+    <thead>
+    <tr>
+        <th>Video Title</th>
+        <th>Người Thích</th>
+        <th>Ngày Thích</th>
     </tr>
     </thead>
     <tbody>
     <c:forEach var="favorite" items="${favorites}">
         <tr>
             <td>${favorite.video.title}</td>
-            <td><img src="${favorite.video.poster}" alt="Poster" width="100"></td>
-            <td>${favorite.video.description}</td>
+            <td>${favorite.user.fullname}</td>
             <td>${favorite.likeDate}</td>
         </tr>
     </c:forEach>
     </tbody>
 </table>
-
 </body>
 </html>

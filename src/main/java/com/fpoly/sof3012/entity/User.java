@@ -34,6 +34,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Favorite> favorites;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user") // ket noi voi field user ben Share
     private List<Favorite> shares;
 }

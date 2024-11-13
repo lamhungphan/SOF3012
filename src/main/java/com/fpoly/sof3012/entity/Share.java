@@ -13,28 +13,31 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Favorites",
+@Table(name = "Share",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"UserId", "VideoId"})}
 )
-public class Favorite {
+public class Share {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "VideoId") // ten khoa ngoai trong table Favorites
+    @JoinColumn(name = "VideoId")
     private Video video;
 
     @ManyToOne
-    @JoinColumn(name = "UserId") // ten khoa ngoai trong table Favorites
+    @JoinColumn(name = "UserId")
     private User user;
 
-    @Temporal(TemporalType.DATE) // chi lay ngay trong java .util.Date
-    private Date likeDate;
+    private String emails;
 
-    public Favorite(Video video, User user, Date likeDate) {
+    @Temporal(TemporalType.DATE)
+    private Date shareDate;
+
+    public Share(Video video, User user, String emails, Date shareDate) {
         this.video = video;
         this.user = user;
-        this.likeDate = likeDate;
+        this.emails = emails;
+        this.shareDate = shareDate;
     }
 }

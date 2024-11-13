@@ -9,7 +9,7 @@ public class XJpa {
 
     public static EntityManager getEntityManager() {
         if (factory == null || factory.isOpen()) {
-            factory = Persistence.createEntityManagerFactory("PolyOE");
+            factory = Persistence.createEntityManagerFactory("PolyOE_Lab");
         }
         return factory.createEntityManager();
     }
